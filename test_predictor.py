@@ -1,74 +1,62 @@
-from predictor import predict_from_live
-from config import TIME_STEPS
+```python
+from predictor import predict_next_signal
 
-# ------------------------------------------------------------
-# TEST DATA
-# ------------------------------------------------------------
-# These are example traffic-load values.
-# We only need 30 values to test the trained LSTM.
 
-test_values = [
-    8, 10, 12, 11, 14,
-    15, 13, 16, 18, 17,
-    20, 19, 21, 22, 20,
-    23, 25, 24, 26, 28,
-    27, 29, 30, 28, 31,
-    32, 30, 33, 35, 34
-]
+def main():
+    result = predict_next_signal()
 
-# ------------------------------------------------------------
-# CHECK DATA LENGTH
-# ------------------------------------------------------------
+    print("\n===== SMARTFLOW PREDICTION =====")
 
-if len(test_values) < TIME_STEPS:
-    raise ValueError(
-        f"Need at least {TIME_STEPS} values."
+    print(
+        f"Predicted Total Vehicles : "
+        f"{result['predicted_total_vehicles']:.2f}"
     )
 
-# ------------------------------------------------------------
-# RUN LSTM + PSO
-# ------------------------------------------------------------
+    print(
+        f"Predicted Traffic Load  : "
+        f"{result['predicted_traffic_load']:.2f}"
+    )
 
-result = predict_from_live(
-    test_values
-)
+    print(
+        f"Traffic Class            : "
+        f"{result['traffic_class']}"
+    )
 
-# ------------------------------------------------------------
-# DISPLAY RESULT
-# ------------------------------------------------------------
+    print(
+        f"Low Threshold            : "
+        f"{result['low_threshold']:.2f}"
+    )
 
-print("\n====================================")
-print("SMARTFLOW PREDICTION TEST")
-print("====================================")
+    print(
+        f"High Threshold           : "
+        f"{result['high_threshold']:.2f}"
+    )
 
-print(
-    f"Predicted Traffic Load : "
-    f"{result['prediction']:.2f}"
-)
+    signal = result["signal"]
 
-print(
-    f"Traffic Level          : "
-    f"{result['level']}"
-)
+    print(
+        f"PSO Green Time           : "
+        f"{signal['green']:.0f} sec"
+    )
 
-print(
-    f"PSO Green Time         : "
-    f"{result['green']} sec"
-)
+    print(
+        f"Yellow Time              : "
+        f"{signal['yellow']} sec"
+    )
 
-print(
-    f"Yellow Time            : "
-    f"{result['yellow']} sec"
-)
+    print(
+        f"Red Time                 : "
+        f"{signal['red']} sec"
+    )
 
-print(
-    f"Red Time               : "
-    f"{result['red']} sec"
-)
+    print(
+        f"Total Cycle              : "
+        f"{signal['cycle']:.0f} sec"
+    )
 
-print(
-    f"Total Cycle            : "
-    f"{result['cycle']} sec"
-)
+    print("\n===== TEST COMPLETED =====")
 
-print("====================================")
+
+if __name__ == "__main__":
+    main()
+```
