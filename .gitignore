@@ -1,0 +1,75 @@
+# ============================================================
+
+# SMARTFLOW Git Ignore
+
+# ============================================================
+
+# Python cache
+
+**pycache**/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+
+venv/
+.venv/
+env/
+ENV/
+
+# IDE / editor files
+
+.vscode/
+.idea/
+
+# Jupyter
+
+.ipynb_checkpoints/
+
+# Operating system files
+
+.DS_Store
+Thumbs.db
+
+# Python build files
+
+build/
+dist/
+*.egg-info/
+
+# Logs
+
+*.log
+
+# Streamlit
+
+.streamlit/secrets.toml
+
+# Runtime traffic data
+
+SmartFlow_Live_Traffic.csv
+
+# Temporary / generated files
+
+*.tmp
+*.temp
+
+# Local camera/debug files
+
+camera_test/
+screenshots/
+recordings/
+
+# TensorFlow / model cache
+
+.keras/
+.tensorflow/
+
+# Local environment configuration
+
+.env
+.env.*
+
+# Ignore generated Python cache directories anywhere
+
+**/**pycache**/
