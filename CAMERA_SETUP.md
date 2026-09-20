@@ -1,180 +1,86 @@
-# SmartFlow — Camera Assembly & Setup
+````markdown
+# SMARTFLOW Camera Setup
 
-This document explains how to assemble and configure the camera component of the **SMARTFLOW AI-Based Adaptive Traffic Signal Control System**.
+SMARTFLOW uses a smartphone as an IP camera for real-time vehicle detection.
 
-The camera provides the live traffic stream that is processed by YOLO11n for real-time vehicle detection.
+The smartphone streams video over the local Wi-Fi network, while the laptop runs the YOLO11n vehicle detection and tracking pipeline.
 
 ---
 
-## 1. Camera System Overview
+## 1. Requirements
 
-The SmartFlow camera pipeline is:
+You need:
+
+- A smartphone
+- A laptop/PC
+- Both devices connected to the same Wi-Fi network
+- An IP camera application on the smartphone
+- Python environment with SMARTFLOW dependencies installed
+
+---
+
+## 2. Start the Smartphone Camera
+
+Install and open an IP camera application that provides an HTTP/MJPEG video stream.
+
+Start the camera server.
+
+The application should display an IP address similar to:
 
 ```text
-                SMARTPHONE CAMERA
-                       │
-                       │ Wi-Fi
-                       ▼
-               IP CAMERA STREAM
-                       │
-                       │ HTTP
-                       ▼
-                  OpenCV
-                       │
-                       ▼
-                   YOLO11n
-                       │
-          ┌────────────┼────────────┐
-          ▼            ▼            ▼
-        Cars       Motorcycles     Buses/Trucks
-          │            │            │
-          └────────────┼────────────┘
-                       ▼
-                Traffic Counts
-                       │
-                       ▼
-                  Traffic Load
-```
+http://192.168.x.x:8080
+````
 
-The smartphone acts as an **IP camera**, while the computer running SmartFlow receives the camera stream over the local network.
+The exact IP address depends on your local Wi-Fi network.
 
 ---
 
-# 2. Hardware Required
+## 3. Find the Camera IP Address
 
-### Required Components
-
-| Component                | Purpose                                   |
-| ------------------------ | ----------------------------------------- |
-| Android smartphone       | Live traffic camera                       |
-| Smartphone holder/tripod | Keeps the camera stable                   |
-| Computer/laptop          | Runs YOLO11n, LSTM, PSO and Streamlit     |
-| Wi-Fi router/hotspot     | Connects phone and computer               |
-| Power bank/charger       | Keeps smartphone powered during operation |
-
-### Recommended Setup
-
-The smartphone should be mounted at an elevated and stable position with a clear view of the traffic lane/intersection.
+Suppose the smartphone displays:
 
 ```text
-              TRAFFIC ROAD
-────────────────────────────────────
-
-        🚗     🏍️      🚌      🚚
-        
-              ↑
-              │
-        CAMERA VIEW
-              │
-              │
-        ┌─────────────┐
-        │ Smartphone  │
-        │   Camera    │
-        └─────────────┘
-              │
-           Tripod/
-            Mount
+192.168.1.105
 ```
 
----
-
-# 3. Physical Camera Assembly
-
-## Step 1 — Mount the Smartphone
-
-Place the smartphone on a stable tripod or phone holder.
-
-The camera should:
-
-* Remain stationary.
-* Have a clear view of incoming traffic.
-* Avoid excessive vibration.
-* Avoid direct obstruction by trees, poles, vehicles, etc.
-* Capture the road from an elevated position where possible.
-
-### Important
-
-Do not continuously move or rotate the phone after starting the system.
-
-YOLO detection works more consistently when the camera viewpoint remains stable.
-
----
-
-# 4. Recommended Camera Position
-
-The camera should be positioned so that vehicles are clearly visible.
-
-### Preferred View
+The SMARTFLOW video URL would be:
 
 ```text
-                 CAMERA
-                    │
-                    │
-                    ▼
-        ┌─────────────────────┐
-        │                     │
-        │     ROAD AREA       │
-        │                     │
-        │   🚗  🏍️  🚗       │
-        │      🚌             │
-        │          🚚         │
-        │                     │
-        └─────────────────────┘
+http://192.168.1.105:8080/video
 ```
 
-Try to ensure that:
-
-* Vehicles are not extremely small.
-* The road occupies most of the useful camera frame.
-* Vehicles are visible from the front/side rather than completely hidden.
-* Lighting is adequate.
-* The camera is not pointed directly toward strong sunlight.
+Your actual IP address will usually be different.
 
 ---
 
-# 5. Connect the Smartphone and Computer
+## 4. Test the Camera Stream
 
-The smartphone and computer must be connected to the **same local network**.
+Before starting SMARTFLOW, open the following URL in a browser on the laptop:
+
+```text
+http://YOUR_PHONE_IP:8080/video
+```
 
 For example:
 
 ```text
-              Wi-Fi Network
-                    │
-          ┌─────────┴─────────┐
-          │                   │
-          ▼                   ▼
-     Smartphone            Computer
-     IP Camera           SmartFlow
+http://192.168.1.105:8080/video
 ```
 
-The computer must be able to access the IP address assigned to the smartphone.
+If the camera stream appears in the browser, the connection is working.
+
+If it does not work, check:
+
+1. Phone and laptop are on the same Wi-Fi network.
+2. The IP camera application is running.
+3. The camera server is active.
+4. The displayed phone IP address is correct.
+5. Port `8080` is correct for your camera application.
+6. The laptop firewall is not blocking the connection.
 
 ---
 
-# 6. Start the Smartphone IP Camera
-
-Use an Android IP-camera application capable of providing an HTTP video stream.
-
-Start the camera server on the smartphone.
-
-The application will display an IP address similar to:
-
-```text
-http://10.10.210.139:8080
-```
-
-Your SmartFlow system uses the video endpoint:
-
-```text
-http://10.10.210.139:8080/video
-```
-
-The exact IP address can change depending on the network.
-
----
-
-# 7. Configure `config.py`
+## 5. Configure SMARTFLOW
 
 Open:
 
@@ -182,373 +88,275 @@ Open:
 config.py
 ```
 
-Set the smartphone IP address:
-
-```python
-CAMERA_IP = "10.10.210.139"
-CAMERA_URL = f"http://{CAMERA_IP}:8080/video"
-```
-
-If the phone receives a different IP address, update only:
-
-```python
-CAMERA_IP
-```
-
-For example:
-
-```python
-CAMERA_IP = "192.168.1.25"
-```
-
-The video URL will automatically become:
-
-```text
-http://192.168.1.25:8080/video
-```
-
----
-
-# 8. Test the Camera Before Running SmartFlow
-
-Before starting the complete application, test the camera stream.
-
-Open the camera stream URL in a browser on the computer:
-
-```text
-http://YOUR_PHONE_IP:8080/video
-```
-
-For example:
-
-```text
-http://10.10.210.139:8080/video
-```
-
-If the live video appears, the phone-camera connection is working.
-
----
-
-# 9. SmartFlow Camera Connection
-
-The SmartFlow application uses OpenCV to connect to the camera:
-
-```python
-cap = cv2.VideoCapture(CAMERA_URL)
-```
-
-The camera stream is then read frame by frame:
-
-```text
-IP Camera
-    ↓
-OpenCV VideoCapture
-    ↓
-Frame
-    ↓
-YOLO11n
-    ↓
-Vehicle Detection
-```
-
-The application does not need to save the video continuously.
-
-The camera provides the live stream while SmartFlow processes selected observations.
-
----
-
-# 10. YOLO Detection Frequency
-
-The current configuration uses:
-
-```python
-DETECTION_INTERVAL = 1.0
-```
-
-This means SmartFlow attempts to create approximately **one new traffic observation every second**.
-
-For each observation:
-
-```text
-Camera Frame
-     ↓
-YOLO11n
-     ↓
-Cars
-Motorcycles
-Buses
-Trucks
-     ↓
-Total Vehicles
-     ↓
-Traffic Load
-     ↓
-Live CSV
-     ↓
-LSTM rolling window
-```
-
-For example:
-
-```text
-10:10:01 → Cars 5 | Bikes 8 | Bus 1 | Truck 0
-10:10:02 → Cars 6 | Bikes 7 | Bus 1 | Truck 0
-10:10:03 → Cars 6 | Bikes 9 | Bus 0 | Truck 1
-...
-```
-
----
-
-# 11. Camera Does NOT Control the Traffic Signal Directly
-
-The camera is only the **data acquisition component**.
-
-The complete system is:
-
-```text
-             CAMERA
-                ↓
-             YOLO11n
-                ↓
-        Vehicle Detection
-                ↓
-          Traffic Load
-                ↓
-       Latest 30 Observations
-                ↓
-              LSTM
-                ↓
-      Predicted Traffic Load
-                ↓
-               PSO
-                ↓
-       Optimal Green Time
-                ↓
-       Signal Controller
-```
-
-Therefore:
-
-**Camera → Detection → Prediction → Optimization → Signal Control**
-
----
-
-# 12. Recommended Physical Setup
-
-For a demonstration/project setup, use:
-
-```text
-                    ROAD
-═══════════════════════════════════════
-
-       🚗      🏍️       🚗
-             🚌
-                   🚚
-
-                    ↑
-                    │
-              Camera View
-                    │
-              ┌───────────┐
-              │ Smartphone│
-              │   Camera  │
-              └───────────┘
-                    │
-                 Tripod
-                    │
-                    ▼
-
-             ┌─────────────┐
-             │   TABLE /   │
-             │   STAND     │
-             └─────────────┘
-
-                    Wi-Fi
-                     │
-                     ▼
-
-             ┌─────────────┐
-             │   LAPTOP    │
-             │  SmartFlow  │
-             └─────────────┘
-```
-
----
-
-# 13. Before Starting the System
-
-Check the following:
-
-### Smartphone
-
-* [ ] Camera is mounted securely.
-* [ ] Camera has a clear view of the road.
-* [ ] Smartphone is sufficiently charged.
-* [ ] IP-camera application is running.
-* [ ] Camera server is started.
-
-### Network
-
-* [ ] Smartphone and laptop are connected to the same network.
-* [ ] Smartphone IP address is known.
-* [ ] Camera stream opens from the laptop.
-
-### SmartFlow
-
-* [ ] `CAMERA_IP` is correct in `config.py`.
-* [ ] `CAMERA_URL` points to `/video`.
-* [ ] `yolo11n.pt` is available.
-* [ ] `traffic_lstm.keras` is available.
-* [ ] `traffic_scaler.pkl` is available.
-* [ ] Historical CSV is available.
-* [ ] Live CSV is available.
-
----
-
-# 14. Starting the Complete System
-
-From the SmartFlow project directory:
-
-```bash
-streamlit run app.py
-```
-
-The dashboard should open in the browser.
-
-The system will then:
-
-```text
-1. Connect to smartphone camera
-          ↓
-2. Receive live video
-          ↓
-3. Capture/process traffic observations
-          ↓
-4. Run YOLO11n
-          ↓
-5. Count vehicles
-          ↓
-6. Calculate traffic load
-          ↓
-7. Collect first 30 observations
-          ↓
-8. Run LSTM prediction
-          ↓
-9. Classify traffic
-          ↓
-10. Run PSO
-          ↓
-11. Generate signal timing
-          ↓
-12. Start Cycle 1
-          ↓
-13. Continue collecting new observations
-          ↓
-14. Use latest 30 observations
-          ↓
-15. Generate Cycle 2
-          ↓
-16. Continue adaptively
-```
-
----
-
-# 15. Troubleshooting
-
-## Camera does not appear
-
-Check:
+Find:
 
 ```python
 CAMERA_IP = "YOUR_PHONE_IP"
 ```
 
-Then verify:
+Replace it with your smartphone's current IP address.
 
-```text
-http://YOUR_PHONE_IP:8080/video
+For example:
+
+```python
+CAMERA_IP = "192.168.1.105"
 ```
 
-opens from the laptop.
-
----
-
-## YOLO says camera cannot be opened
-
-Possible causes:
-
-* Phone and laptop are on different networks.
-* Phone IP address changed.
-* IP-camera server is not running.
-* Incorrect port.
-* Incorrect video endpoint.
-* Network firewall is blocking the connection.
-
----
-
-## Camera works in browser but not in SmartFlow
-
-Check:
+SMARTFLOW automatically constructs the video URL:
 
 ```python
 CAMERA_URL = f"http://{CAMERA_IP}:8080/video"
 ```
 
-Also restart Streamlit after changing `config.py`.
+Therefore, you normally only need to change `CAMERA_IP`.
 
 ---
 
-## Video is lagging
+## 6. Run SMARTFLOW
 
-For better performance:
+From the project directory:
 
-* Keep the camera resolution reasonable.
-* Avoid unnecessarily high FPS.
-* Keep the phone stable.
-* Use a reliable local Wi-Fi connection.
-* Keep `DETECTION_INTERVAL` around `1.0` second for the current design.
-* Avoid running multiple heavy applications on the laptop simultaneously.
-
-The live camera display and YOLO processing are separate components: the browser can display the phone's MJPEG stream directly while OpenCV independently reads frames for detection.
-
----
-
-# 16. Camera Component Summary
-
-```text
-┌──────────────────────┐
-│   SMARTPHONE CAMERA  │
-│                      │
-│   Live Road Video    │
-└──────────┬───────────┘
-           │
-           │ Wi-Fi / HTTP
-           ▼
-┌──────────────────────┐
-│        OpenCV        │
-│   Video Acquisition  │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│       YOLO11n        │
-│ Vehicle Detection    │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│   Vehicle Counts     │
-│ Cars / Bikes / Bus   │
-│ Trucks               │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│    Traffic Load      │
-└──────────┬───────────┘
-           │
-           ▼
-      SmartFlow AI
+```bash
+streamlit run app.py
 ```
 
-The smartphone therefore acts as the **real-time visual sensor** of SmartFlow, while the laptop performs vehicle detection, traffic forecasting, optimization, and dashboard visualization.
+The Streamlit dashboard will open in your browser.
+
+SMARTFLOW uses the camera stream for:
+
+* Real-time vehicle detection
+* Vehicle classification
+* Vehicle tracking
+* Traffic-load calculation
+* Live traffic logging
+* Traffic forecasting
+* PSO-based signal optimization
+
+---
+
+## 7. Camera and Detection Architecture
+
+The camera pipeline works as follows:
+
+```text
+Smartphone
+    ↓
+IP Camera Application
+    ↓
+HTTP / MJPEG Stream
+    ↓
+Laptop
+    ↓
+OpenCV
+    ↓
+YOLO11n
+    ↓
+BoT-SORT Tracking
+    ↓
+Vehicle Counts
+    ↓
+Traffic Load
+```
+
+The browser can display the MJPEG stream directly, while OpenCV processes the stream separately for vehicle detection.
+
+This helps keep the dashboard video display responsive while the AI pipeline performs detection.
+
+---
+
+## 8. Vehicle Detection
+
+SMARTFLOW uses:
+
+```text
+YOLO11n
+```
+
+for object detection and:
+
+```text
+BoT-SORT
+```
+
+for multi-object tracking.
+
+The system identifies relevant vehicle classes and uses them to calculate weighted traffic load.
+
+The configured vehicle weights are:
+
+| Vehicle    | Weight |
+| ---------- | -----: |
+| Motorcycle |    0.5 |
+| Car        |    1.0 |
+| Bus        |    3.0 |
+| Truck      |    3.5 |
+
+Traffic load is calculated as:
+
+```text
+Traffic Load =
+Motorcycles × 0.5
++ Cars × 1.0
++ Buses × 3.0
++ Trucks × 3.5
+```
+
+---
+
+## 9. Detection Interval
+
+SMARTFLOW performs traffic detection approximately every:
+
+```text
+1 second
+```
+
+This is controlled by:
+
+```python
+DETECTION_INTERVAL = 1.0
+```
+
+in `config.py`.
+
+The interval can be changed depending on system performance.
+
+---
+
+## 10. Network Requirements
+
+The smartphone and laptop should normally be connected to the same local network.
+
+Example:
+
+```text
+Phone:
+192.168.1.105
+
+Laptop:
+192.168.1.110
+```
+
+Both devices are on:
+
+```text
+192.168.1.x
+```
+
+and can communicate with each other.
+
+---
+
+## 11. Troubleshooting
+
+### Camera stream does not open
+
+Check:
+
+```text
+Phone camera application → Running
+Phone and laptop → Same Wi-Fi
+IP address → Correct
+Port → Correct
+```
+
+Then test:
+
+```text
+http://YOUR_PHONE_IP:8080/video
+```
+
+in the laptop browser.
+
+---
+
+### OpenCV cannot connect
+
+Verify the value in:
+
+```python
+CAMERA_IP = "YOUR_PHONE_IP"
+```
+
+and make sure the generated URL is:
+
+```text
+http://YOUR_PHONE_IP:8080/video
+```
+
+Also check whether the camera application allows connections from other devices on the network.
+
+---
+
+### Video works in browser but YOLO does not detect vehicles
+
+Check:
+
+```text
+YOLO_MODEL
+YOLO_CONFIDENCE
+TRACKER_CONFIG
+```
+
+in `config.py`.
+
+The default configuration is:
+
+```python
+YOLO_MODEL = "yolo11n.pt"
+YOLO_CONFIDENCE = 0.35
+TRACKER_CONFIG = "botsort.yaml"
+```
+
+---
+
+## 12. Important Note
+
+The smartphone IP address can change when the phone reconnects to Wi-Fi.
+
+If the camera stops working after reconnecting:
+
+1. Open the IP camera application.
+2. Find the new phone IP address.
+3. Update `CAMERA_IP` in your local `config.py`.
+4. Restart SMARTFLOW.
+
+Do not commit your local network IP address to the public repository.
+
+The GitHub version intentionally uses:
+
+```python
+CAMERA_IP = "YOUR_PHONE_IP"
+```
+
+---
+
+## 13. Complete Startup Flow
+
+```text
+1. Connect phone and laptop to the same Wi-Fi
+                ↓
+2. Start IP camera application
+                ↓
+3. Find phone IP address
+                ↓
+4. Update CAMERA_IP locally
+                ↓
+5. Test /video URL in browser
+                ↓
+6. Start Streamlit
+                ↓
+7. YOLO detects vehicles
+                ↓
+8. BoT-SORT tracks vehicles
+                ↓
+9. Traffic load is calculated
+                ↓
+10. LSTM forecasts future traffic
+                ↓
+11. Traffic class is determined
+                ↓
+12. PSO optimizes green time
+                ↓
+13. Signal controller executes timing
+```
