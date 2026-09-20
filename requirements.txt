@@ -1,0 +1,12 @@
+```text
+streamlit
+opencv-python
+ultralytics
+tensorflow
+numpy
+pandas
+scikit-learn
+joblib
+matplotlib
+requests
+```
